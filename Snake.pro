@@ -7,5 +7,10 @@ TARGET = Snake
 INCLUDEPATH += .
 QT += widgets
 # Input
-HEADERS += snake.h
-SOURCES += main.cpp snake.cpp
+HEADERS += snake.h \
+    FoodItem.h \
+    SnakeItem.h \
+    ConstValue.h
+SOURCES += main.cpp snake.cpp \
+    FoodItem.cpp \
+    SnakeItem.cpp
