@@ -3,9 +3,7 @@
 #include <QBrush>
 #include <QGraphicsLineItem>
 #include <QTime>
-#include "snake.h"
-
-#include <QDebug>
+#include "Snake.h"
 
 const int MAP_COUNT_SNAKE = 20;  //地图由各自组成，这个值表示格子的数量，值为20，表示地图由20X20个格子组成
 const int MAP_SIZE_SNAKE = 20;  //每个格子的尺寸均为QSize(MAP_SIZE_SNAKE,MAP_SIZE_SNAKE)
@@ -14,24 +12,7 @@ const int MOVE_SPEED_SNAKE = 700;  //设默认移动速度，单位为毫秒
 Snake::Snake(QWidget *parent)
     : QDialog(parent)
 {
-    isMoving_bool = false;
-    gameIsOver_bool = false;
-
-    getFoodNumber_int = 0;
-
 	currentDirction_enum = GoLeft;
-
-	newGame_PushButton = new QPushButton(tr("新游戏"));
-    goOrStop_PushButton = new QPushButton(tr("开始"));
-	close_PushButton = new QPushButton(tr("结束"));
-
-	easy_RadioButton = new QRadioButton(tr("简单"));
-	normal_RadioButton = new QRadioButton(tr("普通"));
-	hard_RadioButton = new QRadioButton(tr("困难"));
-
-	level_GroupBox = new QGroupBox(tr("游戏难度"));
-
-    info_Label = new QLabel;
 
 	gameView_GraphicsView = new QGraphicsView;
 	gameMap_GraphicsScene = new QGraphicsScene;
@@ -43,43 +24,22 @@ Snake::Snake(QWidget *parent)
 	snake_GraphicsPathItem = new QGraphicsPathItem;
 	snake_GraphicsPathItem->setBrush(QBrush(QColor(Qt::green)));
 	gameMap_GraphicsScene->addItem(snake_GraphicsPathItem);
-    clock_Timer->setInterval(MOVE_SPEED_SNAKE);
-    easy_RadioButton->setChecked(true);
-    info_Label->setFixedWidth(120);
-    info_Label->setText(tr("准备就绪"));
-    info_Label->setAlignment(Qt::AlignCenter);
+	clock_Timer->setInterval(MOVE_SPEED_SNAKE);
+	clock_Timer->start();
 
 	createGameMap();
 	createWall();
 	putFood();
 	setSnakeShape();
 
-	QVBoxLayout* button_Layout = new QVBoxLayout;
-	button_Layout->addWidget(newGame_PushButton);
-    button_Layout->addWidget(goOrStop_PushButton);
-	button_Layout->addWidget(close_PushButton);
-	QHBoxLayout* level_Layout = new QHBoxLayout;
-	level_Layout->addWidget(easy_RadioButton);
-	level_Layout->addWidget(normal_RadioButton);
-	level_Layout->addWidget(hard_RadioButton);
-	level_GroupBox->setLayout(level_Layout);
-	QHBoxLayout* option_Layout = new QHBoxLayout;
-	option_Layout->addWidget(level_GroupBox);
-    option_Layout->addWidget(info_Label);
-	option_Layout->addLayout(button_Layout);
-
-	QVBoxLayout* main_Layout = new QVBoxLayout;
+	QHBoxLayout* main_Layout = new QHBoxLayout;
 	main_Layout->addWidget(gameView_GraphicsView);
-	main_Layout->addLayout(option_Layout);
 	setLayout(main_Layout);
 	main_Layout->setSizeConstraint(QLayout::SetFixedSize);
 
 	connect(clock_Timer, SIGNAL(timeout()), this, SLOT(movingSnake()));
 	connect(this, SIGNAL(eatFood()), this, SLOT(movingFood()));
 	connect(this, SIGNAL(gameLost()), this, SLOT(gameOver()));
-    connect(newGame_PushButton,SIGNAL(clicked()),this,SLOT(resetGame()));
-    connect(goOrStop_PushButton,SIGNAL(clicked()),this,SLOT(keepMoving()));
-    connect(close_PushButton,SIGNAL(clicked()),this,SLOT(close()));
 }
 
 Snake::~Snake()
@@ -156,11 +116,6 @@ void Snake::setSnakeShape(const QList<GridPoint>& newSnakePath)
 
 void Snake::keyPressEvent(QKeyEvent* event)
 {
-    if(gameIsOver_bool)
-    {
-        QDialog::keyPressEvent(event);
-        return;
-    }
 	switch (event->key())
 	{
 	case Qt::Key_W:
@@ -190,7 +145,6 @@ void Snake::keyPressEvent(QKeyEvent* event)
 	default:
 		break;
 	}
-    QDialog::keyPressEvent(event);
 }
 
 void Snake::movingSnake()
@@ -220,10 +174,7 @@ void Snake::movingSnake()
 		return;
 	}
 	if (snakeHead.x*MAP_SIZE_SNAKE == food_GraphicsRectItem->pos().x() && snakeHead.y*MAP_SIZE_SNAKE == food_GraphicsRectItem->pos().y())
-    {
-        ++getFoodNumber_int;
 		emit eatFood();
-    }
 	else
 	    snakePath_List.pop_back();
 
@@ -233,13 +184,6 @@ void Snake::movingSnake()
 
 void Snake::movingFood()
 {
-    if(getFoodNumber_int == 10)
-    {
-        info_Label->setText(tr("游戏胜利"));
-        clock_Timer->stop();
-        gameIsOver_bool = true;
-        return;
-    }
 	qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
 	GridPoint p;
 	while (true)
@@ -255,104 +199,4 @@ void Snake::movingFood()
 void Snake::gameOver()
 {
 	clock_Timer->stop();
-    gameIsOver_bool = true;
-    info_Label->setText(tr("游戏失败"));
 }
-
-void Snake::resetGame()
-{
-    snakePath_List.clear();
-    clock_Timer->stop();
-    putFood();
-    setSnakeShape();
-    if(easy_RadioButton->isChecked())
-        clock_Timer->setInterval(700);
-    else if(normal_RadioButton->isChecked())
-        clock_Timer->setInterval(500);
-    else if(hard_RadioButton->isChecked())
-        clock_Timer->setInterval(300);
-
-    getFoodNumber_int = 0;
-    currentDirction_enum = GoLeft;
-    gameIsOver_bool = false;
-    isMoving_bool = false;
-    goOrStop_PushButton->setText(tr("开始"));
-    info_Label->setText(tr("准备就绪"));
-}
-
-void Snake::keepMoving()
-{
-    if(gameIsOver_bool)
-        return;
-    if(isMoving_bool)
-    {
-        clock_Timer->stop();
-        isMoving_bool = false;
-        goOrStop_PushButton->setText(tr("开始"));
-        info_Label->setText(tr("游戏暂停"));
-    }
-    else
-    {
-        clock_Timer->start();
-        isMoving_bool = true;
-        goOrStop_PushButton->setText(tr("暂停"));
-        info_Label->setText(tr("游戏运行中"));
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

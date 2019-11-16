@@ -8,10 +8,6 @@
 #include <QGraphicsPathItem>
 #include <QTimer>
 #include <QKeyEvent>
-#include <QPushButton>
-#include <QRadioButton>
-#include <QGroupBox>
-#include <QLabel>
 
 struct GridPoint
 {
@@ -26,11 +22,6 @@ class Snake : public QDialog
 {
     Q_OBJECT
 private:
-    bool isMoving_bool;
-    bool gameIsOver_bool;
-
-    int getFoodNumber_int;
-
 	MoveDirction currentDirction_enum;
 
 	QGraphicsView* gameView_GraphicsView;
@@ -43,18 +34,6 @@ private:
 	QTimer* clock_Timer;
 
 	QList<GridPoint> snakePath_List;
-
-	QPushButton* newGame_PushButton;
-    QPushButton* goOrStop_PushButton;
-	QPushButton* close_PushButton;
-
-	QRadioButton* easy_RadioButton;
-	QRadioButton* normal_RadioButton;
-	QRadioButton* hard_RadioButton;
-
-    QLabel* info_Label;
-
-	QGroupBox* level_GroupBox;
 
 	void createGameMap();
 	void createWall();
@@ -72,52 +51,6 @@ private slots:
 	void movingSnake();
 	void movingFood();
 	void gameOver();
-    void resetGame();
-    void keepMoving();
 };
 
 #endif // SNAKE_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
