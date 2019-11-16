@@ -12,9 +12,15 @@
 #include <QRadioButton>
 #include <QGroupBox>
 #include <QLabel>
-#include "FoodItem.h"
-#include "SnakeItem.h"
 
+struct GridPoint
+{
+	int x;
+	int y;
+	bool operator==(const GridPoint& p){ return (p.x == x && p.y == y); }
+};
+
+enum MoveDirction{GoUp,GoDown,GoLeft,GoRight};
 
 class Snake : public QDialog
 {
@@ -30,11 +36,9 @@ private:
 	QGraphicsView* gameView_GraphicsView;
 	QGraphicsScene* gameMap_GraphicsScene;
 
-    //QGraphicsRectItem* food_GraphicsRectItem;
-    FoodItem* food_GraphicsRectItem;
+	QGraphicsRectItem* food_GraphicsRectItem;
 
-    //QGraphicsPathItem* snake_GraphicsPathItem;
-    SnakeItem* snake_GraphicsPathItem;
+	QGraphicsPathItem* snake_GraphicsPathItem;
 
 	QTimer* clock_Timer;
 

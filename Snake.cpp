@@ -3,9 +3,13 @@
 #include <QBrush>
 #include <QGraphicsLineItem>
 #include <QTime>
-#include "snake.h"
+#include "Snake.h"
 
+#include <QDebug>
 
+const int MAP_COUNT_SNAKE = 20;  //地图由各自组成，这个值表示格子的数量，值为20，表示地图由20X20个格子组成
+const int MAP_SIZE_SNAKE = 20;  //每个格子的尺寸均为QSize(MAP_SIZE_SNAKE,MAP_SIZE_SNAKE)
+const int MOVE_SPEED_SNAKE = 700;  //设默认移动速度，单位为毫秒
 
 Snake::Snake(QWidget *parent)
     : QDialog(parent)
@@ -36,8 +40,8 @@ Snake::Snake(QWidget *parent)
 	gameView_GraphicsView->setScene(gameMap_GraphicsScene);
 	gameMap_GraphicsScene->setSceneRect(-3, -3, 406, 406);
 	food_GraphicsRectItem = NULL;
-    snake_GraphicsPathItem = new SnakeItem;
-    //snake_GraphicsPathItem->setBrush(QBrush(QColor(Qt::green)));
+	snake_GraphicsPathItem = new QGraphicsPathItem;
+	snake_GraphicsPathItem->setBrush(QBrush(QColor(Qt::green)));
 	gameMap_GraphicsScene->addItem(snake_GraphicsPathItem);
     clock_Timer->setInterval(MOVE_SPEED_SNAKE);
     easy_RadioButton->setChecked(true);
@@ -118,12 +122,11 @@ void Snake::putFood(int x, int y)
 		return;
 	if (food_GraphicsRectItem == NULL)
 	{
-        food_GraphicsRectItem = new FoodItem(getFoodNumber_int);
-        //food_GraphicsRectItem->setBrush(QBrush(QColor(Qt::yellow)));
+		food_GraphicsRectItem = new QGraphicsRectItem(0, 0, MAP_SIZE_SNAKE , MAP_SIZE_SNAKE);
+		food_GraphicsRectItem->setBrush(QBrush(QColor(Qt::yellow)));
 		gameMap_GraphicsScene->addItem(food_GraphicsRectItem);
 	}
 	food_GraphicsRectItem->setPos(x*MAP_SIZE_SNAKE, y*MAP_SIZE_SNAKE);
-    food_GraphicsRectItem->updateNumber(getFoodNumber_int+1);
 }
 
 void Snake::setSnakeShape(const QList<GridPoint>& newSnakePath)
@@ -141,14 +144,14 @@ void Snake::setSnakeShape(const QList<GridPoint>& newSnakePath)
 	else
 		snakePath_List = newSnakePath;
 
-    /*QPainterPath paths;
+	QPainterPath paths;
 	for (auto A : snakePath_List)
 	{
 		paths.addRect(A.x*MAP_SIZE_SNAKE, A.y*MAP_SIZE_SNAKE, MAP_SIZE_SNAKE, MAP_SIZE_SNAKE);
-    }*/
+	}
 
-    snake_GraphicsPathItem->setPath(snakePath_List);
-    gameMap_GraphicsScene->update();
+	snake_GraphicsPathItem->setPath(paths);
+	snake_GraphicsPathItem->update();
 }
 
 void Snake::keyPressEvent(QKeyEvent* event)
@@ -211,25 +214,18 @@ void Snake::movingSnake()
 		emit gameLost();
 		return;
 	}
-    if (snakePath_List.contains(snakeHead))
+	if (snakePath_List.contains(snakeHead))
 	{
 		emit gameLost();
 		return;
-    }
-    if(snake_GraphicsPathItem->collidesWithItem(food_GraphicsRectItem))
-    {
-        ++getFoodNumber_int;
-        emit eatFood();
-    }
-    else
-        snakePath_List.pop_back();
-    /*if (snakeHead.x*MAP_SIZE_SNAKE == food_GraphicsRectItem->pos().x() && snakeHead.y*MAP_SIZE_SNAKE == food_GraphicsRectItem->pos().y())
+	}
+	if (snakeHead.x*MAP_SIZE_SNAKE == food_GraphicsRectItem->pos().x() && snakeHead.y*MAP_SIZE_SNAKE == food_GraphicsRectItem->pos().y())
     {
         ++getFoodNumber_int;
 		emit eatFood();
     }
 	else
-        snakePath_List.pop_back();*/
+	    snakePath_List.pop_back();
 
 	snakePath_List.push_front(snakeHead);
 	setSnakeShape(snakePath_List);
@@ -242,7 +238,6 @@ void Snake::movingFood()
         info_Label->setText(tr("游戏胜利"));
         clock_Timer->stop();
         gameIsOver_bool = true;
-        food_GraphicsRectItem->setPos(-50,-50);//把食物移到view外面
         return;
     }
 	qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
@@ -266,7 +261,6 @@ void Snake::gameOver()
 
 void Snake::resetGame()
 {
-    getFoodNumber_int = 0;
     snakePath_List.clear();
     clock_Timer->stop();
     putFood();
@@ -278,6 +272,7 @@ void Snake::resetGame()
     else if(hard_RadioButton->isChecked())
         clock_Timer->setInterval(300);
 
+    getFoodNumber_int = 0;
     currentDirction_enum = GoLeft;
     gameIsOver_bool = false;
     isMoving_bool = false;
