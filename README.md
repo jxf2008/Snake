@@ -9,4 +9,4 @@
 
 这是最初版本
 
-![](https://github.com/jxf2008/blog/raw/master/pix/QtNotes/18-1.png)
+![](https://jxf2008-1302581379.cos.ap-nanjing.myqcloud.com/QtNotes/17-1.png)
