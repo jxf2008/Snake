@@ -10,12 +10,12 @@
 
 master
 
-![](https://github.com/jxf2008/blog/raw/master/pix/QtNotes/17-1.png)
+![](https://jxf2008-1302581379.cos.ap-nanjing.myqcloud.com/QtNotes/17-1.png)
 
 Snake1.0
 
-![](https://github.com/jxf2008/blog/raw/master/pix/QtNotes/18-1.png)
+![](https://jxf2008-1302581379.cos.ap-nanjing.myqcloud.com/QtNotes/18-1.png)
 
 Snake2.0
 
-![](https://github.com/jxf2008/blog/raw/master/pix/QtNotes/19-1.png)
+![](https://jxf2008-1302581379.cos.ap-nanjing.myqcloud.com/QtNotes/19-1.png)
